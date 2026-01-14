@@ -1,16 +1,14 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import LLMChain
-from app.core.config import GOOGLE_API_KEY
+from app.core.config import settings
 import os
 
 # Initialize Gemini
 # Ensure GOOGLE_API_KEY is set
-if not GOOGLE_API_KEY:
+if not settings.GOOGLE_API_KEY:
     print("Warning: GOOGLE_API_KEY not found.")
 
-llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=GOOGLE_API_KEY, convert_system_message_to_human=True)
+llm = ChatGoogleGenerativeAI(model="models/gemini-2.5-flash", google_api_key=settings.GOOGLE_API_KEY, convert_system_message_to_human=True)
 
 # System Prompt
 system_template = """
@@ -36,9 +34,8 @@ prompt = ChatPromptTemplate.from_template(system_template)
 # In a real API, memory handling usually requires storing session_id and history in DB
 def get_ai_response(question: str, context: str = ""):
     try:
-        if not GOOGLE_API_KEY:
+        if not settings.GOOGLE_API_KEY:
             return "AI service is not configured (Missing API Key)."
-            
         chain = prompt | llm
         response = chain.invoke({"question": question, "context": context})
         return response.content

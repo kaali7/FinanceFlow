@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers import finance, chat
+from app.routers import finance, chat, auth
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
 
@@ -22,7 +22,12 @@ app.add_middleware(
 # Include Routers
 app.include_router(finance.router)
 app.include_router(chat.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Financial Literacy & Budgeting Assistant API"}
+
+@app.get("/status")
+def check_status():
+    return {"message": "it working"}

@@ -1,9 +1,26 @@
--- Users table (Managed by Supabase Auth usually, but creating a public profile reference if needed)
--- In Supabase, 'auth.users' handles authentication. We might want a public 'profiles' table or just reference auth.users.
--- For this project, we'll assume we can link to auth.users or just store user data if not using full Supabase Auth UI.
--- Let's create a local 'users' table for simplicity if strictly using custom auth, 
--- but best practice with Supabase is to use their Auth.
--- We will assume the use of Supabase Auth, so 'user_id' in other tables will be UUIDs.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    salt TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    token UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE NOT NULL,
+    monthly_income DECIMAL(10, 2) DEFAULT 0,
+    savings_rate DECIMAL(5, 2) DEFAULT 0.20,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
 -- 1. Income Table
 CREATE TABLE IF NOT EXISTS income (

@@ -1,13 +1,13 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
-from datetime import date
+import datetime
 from uuid import UUID
 
 # Income Schemas
 class IncomeBase(BaseModel):
     amount: float
     source: str
-    date: date = date.today()
+    entry_date: datetime.date = Field(default_factory=datetime.date.today)
 
 class IncomeCreate(IncomeBase):
     pass
@@ -22,7 +22,7 @@ class ExpenseBase(BaseModel):
     amount: float
     category: str
     description: Optional[str] = None
-    date: date = date.today()
+    entry_date: datetime.date = Field(default_factory=datetime.date.today)
 
 class ExpenseCreate(ExpenseBase):
     pass
@@ -52,3 +52,18 @@ class BudgetSummary(BaseModel):
     savings_recommendation: float
     status: str # "Under Budget", "Over Budget", "On Track"
     category_breakdown: dict
+    emergency_fund_recommendation: float | None = 0
+    alerts: list[str] | None = []
+    insights: str | None = ""
+    overspending_categories: list[str] | None = []
+
+class BudgetPlanRequest(BaseModel):
+    month: str
+
+class BudgetPlanResponse(BaseModel):
+    month: str
+    needs: float
+    wants: float
+    savings: float
+    total_budget: float
+    explanation: str

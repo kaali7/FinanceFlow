@@ -1,3 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    background-color: theme('colors.background');
+    @apply text-gray-800 font-sans antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    background-color: theme('colors.primary.DEFAULT');
+    color: white;
+    @apply px-6 py-2.5 rounded-2xl font-medium transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2;
+  }
+  .btn-primary:hover {
+    background-color: theme('colors.primary.hover');
+    box-shadow: theme('boxShadow.glow');
+  }
+  
+  .btn-secondary {
+    background-color: white;
+    @apply text-gray-700 border border-gray-200 px-6 py-2.5 rounded-2xl font-medium transition-all duration-300 hover:shadow-soft hover:scale-105 active:scale-95 flex items-center justify-center gap-2;
+  }
+  .btn-secondary:hover {
+    border-color: theme('colors.primary.DEFAULT');
+    color: theme('colors.primary.DEFAULT');
+  }
+  
+  .card-base {
+    background-color: theme('colors.surface');
+    @apply rounded-3xl shadow-soft p-6 transition-all duration-300 hover:shadow-lg border border-gray-50;
+  }
+  
+  .input-field {
+    @apply w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 transition-all duration-200;
+  }
+  .input-field:focus {
+    border-color: theme('colors.primary.DEFAULT');
+    --tw-ring-color: theme('colors.primary.light');
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
