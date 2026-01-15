@@ -1,58 +1,115 @@
+"""
+Finance service module.
+Handles financial data retrieval and budget calculations.
+"""
+
 from typing import List, Dict
 from app.core.config import supabase
 from app.schemas.finance import BudgetSummary
 
 def get_monthly_data(user_id: str, month: str):
+    """
+    Retrieve all financial data for a specific user and month.
+    
+    Args:
+        user_id: UUID of the user
+        month: Month in YYYY-MM format (e.g., "2026-01")
+        
+    Returns:
+        tuple: (incomes, expenses, budget_data) for the specified month
+    """
+    # Define date range for the month
     start_date = f"{month}-01"
+    
+    # Fetch income records for the month
     income_response = supabase.table("income").select("*").eq("user_id", user_id).gte("date", start_date).lte("date", f"{month}-31").execute()
     incomes = income_response.data
+    
+    # Fetch expense records for the month
     expense_response = supabase.table("expenses").select("*").eq("user_id", user_id).gte("date", start_date).lte("date", f"{month}-31").execute()
     expenses = expense_response.data
+    
+    # Fetch budget settings for the month
     budget_response = supabase.table("budgets").select("*").eq("user_id", user_id).eq("month", month).execute()
     budget_data = budget_response.data[0] if budget_response.data else None
     
     return incomes, expenses, budget_data
 
 def calculate_summary(user_id: str, month: str) -> BudgetSummary:
+    """
+    Calculate comprehensive budget summary with insights and recommendations.
+    
+    This function aggregates financial data and provides:
+    - Total income and expenses
+    - Budget status (on track, over budget, under budget)
+    - Category-wise spending breakdown
+    - Savings recommendations
+    - Emergency fund recommendations
+    - Alerts for overspending
+    
+    Args:
+        user_id: UUID of the user
+        month: Month in YYYY-MM format
+        
+    Returns:
+        BudgetSummary: Complete financial summary with all calculations
+    """
+    # Safety check for database connection
     if not supabase:
         return BudgetSummary(total_income=0, total_expenses=0, remaining_budget=0, savings_recommendation=0, status="Database not connected", category_breakdown={}, emergency_fund_recommendation=0, alerts=[], insights="", overspending_categories=[])
 
+    # Retrieve all financial data for the month
     incomes, expenses, budget_data = get_monthly_data(user_id, month)
     
+    # Calculate total income and expenses
     total_income = sum(item['amount'] for item in incomes)
     total_expenses = sum(item['amount'] for item in expenses)
     
+    # Get budget amount (if user has set one)
     budget_amount = budget_data['total_budget'] if budget_data else 0
     
+    # Calculate remaining budget
     remaining = budget_amount - total_expenses
     
+    # Recommend saving 20% of income (50/30/20 rule)
     savings_rec = total_income * 0.20
     
+    # Determine budget status
     status = "On Track"
     if total_expenses > budget_amount and budget_amount > 0:
         status = "Over Budget"
     elif total_expenses < budget_amount:
         status = "Under Budget"
-        
+    
+    # Create category-wise spending breakdown
     breakdown = {}
     for exp in expenses:
         cat = exp['category']
         breakdown[cat] = breakdown.get(cat, 0) + exp['amount']
+    
+    # Generate alerts for financial issues
     alerts = []
     if total_expenses > total_income and total_income > 0:
         alerts.append("Expenses exceed income")
     if budget_amount and total_expenses > budget_amount:
         alerts.append("Expenses exceed budget")
+    
+    # Calculate emergency fund recommendation (3 months of expenses)
     emergency_fund = total_expenses * 3
+    
+    # Identify top spending categories
     top_cats = sorted(breakdown.items(), key=lambda x: x[1], reverse=True)
     overspending = [c for c, _ in top_cats[:3]]
+    
+    # Generate insights text
     insights_text = ""
     if overspending:
         insights_text = f"Top spending categories: {', '.join(overspending)}"
     
-    # Sort expenses by date (most recent first)
+    # Sort expenses by date (most recent first) for display
     sorted_expenses = sorted(expenses, key=lambda x: x['date'], reverse=True)
     
+    # Return comprehensive budget summary
     return BudgetSummary(
         total_income=total_income, 
         total_expenses=total_expenses, 
