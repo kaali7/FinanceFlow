@@ -45,7 +45,12 @@ def update_profile(data: ProfileData, authorization: str | None = Header(default
     if not user_id:
         raise HTTPException(status_code=401, detail="Login required")
     existing = supabase.table("profiles").select("*").eq("user_id", user_id).execute().data
-    payload = {"user_id": user_id, "monthly_income": data.monthly_income or 0, "savings_rate": data.savings_rate or 0.2}
+    MAX_VAL = 99999999.99
+    income = data.monthly_income or 0
+    if income > MAX_VAL:
+         raise HTTPException(status_code=400, detail="Monthly income is too large (max 99,999,999.99)")
+    
+    payload = {"user_id": user_id, "monthly_income": income, "savings_rate": data.savings_rate or 0.2}
     if existing:
         supabase.table("profiles").update(payload).eq("user_id", user_id).execute()
     else:

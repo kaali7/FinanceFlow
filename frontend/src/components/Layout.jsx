@@ -13,8 +13,9 @@ const Layout = ({ children }) => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: PieChart, label: 'Budget Plan', path: '/planner' },
     { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
+    { icon: PieChart, label: 'Budget Plan', path: '/planner' },
+    { icon: Wallet, label: 'Monthly Summary', path: '/summary' },
   ];
 
   return (

@@ -2,6 +2,52 @@ import React, { useState } from 'react';
 import api from '../services/api';
 import { Target, Save, Zap } from 'lucide-react';
 
+const MessageContent = ({ text }) => {
+  if (!text) return null;
+
+  const lines = text.split('\n');
+
+  return (
+    <div className="text-sm leading-relaxed space-y-2">
+      {lines.map((line, index) => {
+        if (line.startsWith('### ')) {
+          return <h3 key={index} className="text-lg font-bold my-2">{line.replace('### ', '')}</h3>;
+        }
+
+        if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
+            const content = line.trim().replace(/^[\*\-]\s+/, '');
+            const parts = content.split(/(\*\*.*?\*\*)/g);
+            return (
+              <div key={index} className="flex gap-2 ml-2">
+                 <span className="text-gray-500 mt-1.5">•</span>
+                 <span className="flex-1">
+                    {parts.map((part, i) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={i} className="font-semibold text-indigo-700">{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                    })}
+                 </span>
+              </div>
+            );
+        }
+
+        const parts = line.split(/(\*\*.*?\*\*)/g);
+        return (
+          <p key={index} className="min-h-[1.2em]">
+            {parts.map((part, i) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={i} className="font-semibold text-indigo-700">{part.slice(2, -2)}</strong>;
+              }
+              return part;
+            })}
+          </p>
+        );
+      })}
+    </div>
+  );
+};
+
 const BudgetPlanner = () => {
   const [formData, setFormData] = useState({
     month: '2026-01',
@@ -125,8 +171,8 @@ const BudgetPlanner = () => {
               <Zap className="w-5 h-5 text-yellow-500 fill-current" />
               AI Insights
             </h3>
-            <div className="prose prose-sm text-gray-600 bg-yellow-50/50 p-4 rounded-2xl border border-yellow-100">
-              {plan.explanation}
+            <div className="text-gray-600 bg-yellow-50/50 p-4 rounded-2xl border border-yellow-100">
+              <MessageContent text={plan.explanation} />
             </div>
           </div>
         </div>

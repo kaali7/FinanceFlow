@@ -141,3 +141,47 @@ def budget_plan(req: BudgetPlanRequest, authorization: str | None = Header(defau
     if not isinstance(text, str):
         text = "Generated a 50/30/20 plan allocating 50% to needs, 30% to wants, and 20% to savings."
     return BudgetPlanResponse(month=req.month, needs=needs, wants=wants, savings=savings, total_budget=total_budget, explanation=text)
+
+@router.delete("/expenses/{id}")
+def delete_expense(id: str, authorization: str | None = Header(default=None)):
+    check_db()
+    user_id = get_user_by_token(authorization) if authorization else None
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Login required")
+    response = supabase.table("expenses").delete().eq("id", id).eq("user_id", user_id).execute()
+    return {"message": "Expense deleted"}
+
+@router.put("/expenses/{id}", response_model=ExpenseResponse)
+def update_expense(id: str, expense: ExpenseCreate, authorization: str | None = Header(default=None)):
+    check_db()
+    user_id = get_user_by_token(authorization) if authorization else None
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Login required")
+    data = expense.model_dump()
+    data['date'] = str(data.pop('entry_date'))
+    response = supabase.table("expenses").update(data).eq("id", id).eq("user_id", user_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return response.data[0]
+
+@router.delete("/income/{id}")
+def delete_income(id: str, authorization: str | None = Header(default=None)):
+    check_db()
+    user_id = get_user_by_token(authorization) if authorization else None
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Login required")
+    response = supabase.table("income").delete().eq("id", id).eq("user_id", user_id).execute()
+    return {"message": "Income deleted"}
+
+@router.put("/income/{id}", response_model=IncomeResponse)
+def update_income(id: str, income: IncomeCreate, authorization: str | None = Header(default=None)):
+    check_db()
+    user_id = get_user_by_token(authorization) if authorization else None
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Login required")
+    data = income.model_dump()
+    data['date'] = str(data.pop('entry_date'))
+    response = supabase.table("income").update(data).eq("id", id).eq("user_id", user_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Income not found")
+    return response.data[0]

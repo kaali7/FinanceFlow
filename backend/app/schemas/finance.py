@@ -56,6 +56,8 @@ class BudgetSummary(BaseModel):
     alerts: list[str] | None = []
     insights: str | None = ""
     overspending_categories: list[str] | None = []
+    recent_transactions: list[ExpenseResponse] | None = []
+    income_sources: list[IncomeResponse] | None = []
 
 class BudgetPlanRequest(BaseModel):
     month: str

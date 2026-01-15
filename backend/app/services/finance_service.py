@@ -49,4 +49,21 @@ def calculate_summary(user_id: str, month: str) -> BudgetSummary:
     insights_text = ""
     if overspending:
         insights_text = f"Top spending categories: {', '.join(overspending)}"
-    return BudgetSummary(total_income=total_income, total_expenses=total_expenses, remaining_budget=remaining, savings_recommendation=savings_rec, status=status, category_breakdown=breakdown, emergency_fund_recommendation=emergency_fund, alerts=alerts, insights=insights_text, overspending_categories=overspending)
+    
+    # Sort expenses by date (most recent first)
+    sorted_expenses = sorted(expenses, key=lambda x: x['date'], reverse=True)
+    
+    return BudgetSummary(
+        total_income=total_income, 
+        total_expenses=total_expenses, 
+        remaining_budget=remaining, 
+        savings_recommendation=savings_rec, 
+        status=status, 
+        category_breakdown=breakdown, 
+        emergency_fund_recommendation=emergency_fund, 
+        alerts=alerts, 
+        insights=insights_text, 
+        overspending_categories=overspending,
+        recent_transactions=sorted_expenses,
+        income_sources=incomes
+    )
