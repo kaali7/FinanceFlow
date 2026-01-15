@@ -9,6 +9,7 @@ app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
 origins = [
     "http://localhost:5173", # Vite default
     "http://localhost:3000",
+    "https://finance-flow-kappa-six.vercel.app",  # ← USE THIS
 ]
 
 app.add_middleware(
