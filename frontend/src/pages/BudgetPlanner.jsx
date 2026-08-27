@@ -50,7 +50,7 @@ const MessageContent = ({ text }) => {
 
 const BudgetPlanner = () => {
   const [formData, setFormData] = useState({
-    month: '2026-01',
+    month: new Date().toISOString().slice(0, 7),
     monthly_income: 25000,
     savings_rate: 0.2
   });
@@ -108,7 +108,7 @@ const BudgetPlanner = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Income ($)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Income (₹)</label>
             <input
               type="number"
               className="input-field"
@@ -149,19 +149,19 @@ const BudgetPlanner = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center p-3 bg-white rounded-xl shadow-sm">
                 <span className="text-gray-600">Needs (50%)</span>
-                <span className="font-bold text-gray-900">${plan.needs.toFixed(2)}</span>
+                <span className="font-bold text-gray-900">₹{plan.needs.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-white rounded-xl shadow-sm">
                 <span className="text-gray-600">Wants (30%)</span>
-                <span className="font-bold text-gray-900">${plan.wants.toFixed(2)}</span>
+                <span className="font-bold text-gray-900">₹{plan.wants.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-white rounded-xl shadow-sm border border-indigo-100">
                 <span className="text-indigo-600 font-medium">Savings (20%)</span>
-                <span className="font-bold text-indigo-600">${plan.savings.toFixed(2)}</span>
+                <span className="font-bold text-indigo-600">₹{plan.savings.toFixed(2)}</span>
               </div>
               <div className="pt-4 border-t border-indigo-100 flex justify-between items-center">
                 <span className="font-bold text-gray-800">Total Budget</span>
-                <span className="font-bold text-2xl text-primary">${plan.total_budget.toFixed(2)}</span>
+                <span className="font-bold text-2xl text-primary">₹{plan.total_budget.toFixed(2)}</span>
               </div>
             </div>
           </div>

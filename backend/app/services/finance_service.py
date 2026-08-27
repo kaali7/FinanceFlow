@@ -7,6 +7,8 @@ from typing import List, Dict
 from app.core.config import supabase
 from app.schemas.finance import BudgetSummary
 
+import calendar
+
 def get_monthly_data(user_id: str, month: str):
     """
     Retrieve all financial data for a specific user and month.
@@ -18,16 +20,23 @@ def get_monthly_data(user_id: str, month: str):
     Returns:
         tuple: (incomes, expenses, budget_data) for the specified month
     """
-    # Define date range for the month
+    # Define date range for the month dynamically based on actual days in month
+    try:
+        year, m = map(int, month.split("-"))
+        last_day = calendar.monthrange(year, m)[1]
+    except Exception:
+        last_day = 31
+
     start_date = f"{month}-01"
+    end_date = f"{month}-{last_day:02d}"
     
     # Fetch income records for the month
-    income_response = supabase.table("income").select("*").eq("user_id", user_id).gte("date", start_date).lte("date", f"{month}-31").execute()
-    incomes = income_response.data
+    income_response = supabase.table("income").select("*").eq("user_id", user_id).gte("date", start_date).lte("date", end_date).execute()
+    incomes = income_response.data or []
     
     # Fetch expense records for the month
-    expense_response = supabase.table("expenses").select("*").eq("user_id", user_id).gte("date", start_date).lte("date", f"{month}-31").execute()
-    expenses = expense_response.data
+    expense_response = supabase.table("expenses").select("*").eq("user_id", user_id).gte("date", start_date).lte("date", end_date).execute()
+    expenses = expense_response.data or []
     
     # Fetch budget settings for the month
     budget_response = supabase.table("budgets").select("*").eq("user_id", user_id).eq("month", month).execute()

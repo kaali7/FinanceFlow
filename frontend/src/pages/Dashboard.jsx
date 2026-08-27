@@ -157,7 +157,7 @@ const Dashboard = () => {
             <span className="text-indigo-100 text-sm font-medium">Total Balance</span>
           </div>
           <div className="text-3xl font-bold mb-1">
-            ${(summary?.total_income - summary?.total_expenses).toFixed(2)}
+            ₹{(summary?.total_income - summary?.total_expenses).toFixed(2)}
           </div>
           <div className="text-indigo-100 text-sm opacity-80">
             Available to spend
@@ -172,7 +172,7 @@ const Dashboard = () => {
             <span className="text-gray-400 text-sm">Income</span>
           </div>
           <div className="text-3xl font-bold text-gray-800 mb-1">
-             ${summary?.total_income.toFixed(2)}
+             ₹{summary?.total_income.toFixed(2)}
           </div>
           <div className="text-emerald-500 text-sm font-medium flex items-center gap-1">
             +12% <span className="text-gray-400 font-normal">vs last month</span>
@@ -187,10 +187,10 @@ const Dashboard = () => {
             <span className="text-gray-400 text-sm">Expenses</span>
           </div>
           <div className="text-3xl font-bold text-gray-800 mb-1">
-             ${summary?.total_expenses.toFixed(2)}
+             ₹{summary?.total_expenses.toFixed(2)}
           </div>
           <div className="text-gray-500 text-sm">
-             Target: <span className="text-gray-800 font-medium">${(summary?.remaining_budget + summary?.total_expenses).toFixed(2)}</span>
+             Target: <span className="text-gray-800 font-medium">₹{(summary?.remaining_budget + summary?.total_expenses).toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -232,7 +232,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                       <span className="font-bold text-gray-800">-${item.amount.toFixed(2)}</span>
+                       <span className="font-bold text-gray-800">-₹{item.amount.toFixed(2)}</span>
                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => openEditModal(item, 'expense')} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                              <Edit2 className="w-4 h-4" />
@@ -257,7 +257,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                       <span className="font-bold text-emerald-600">+${item.amount.toFixed(2)}</span>
+                       <span className="font-bold text-emerald-600">+₹{item.amount.toFixed(2)}</span>
                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => openEditModal(item, 'income')} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                              <Edit2 className="w-4 h-4" />
@@ -326,7 +326,7 @@ const Dashboard = () => {
             <div>
                <label className="text-sm font-medium text-gray-700 mb-1 block">Amount</label>
                <div className="relative">
-                 <span className="absolute left-3 top-3.5 text-gray-400">$</span>
+                 <span className="absolute left-3 top-3.5 text-gray-400">₹</span>
                  <input type="number" step="0.01" name="amount" placeholder="0.00" className="input-field pl-8" value={formData.amount} onChange={handleInputChange} required />
                </div>
             </div>
@@ -370,7 +370,7 @@ const Dashboard = () => {
             <div>
                <label className="text-sm font-medium text-gray-700 mb-1 block">Amount</label>
                <div className="relative">
-                 <span className="absolute left-3 top-3.5 text-gray-400">$</span>
+                 <span className="absolute left-3 top-3.5 text-gray-400">₹</span>
                  <input type="number" step="0.01" name="amount" placeholder="0.00" className="input-field pl-8" value={formData.amount} onChange={handleInputChange} required />
                </div>
             </div>

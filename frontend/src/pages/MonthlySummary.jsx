@@ -45,6 +45,7 @@ const MonthlySummary = () => {
                 value={months} 
                 onChange={(e) => setMonths(e.target.value)}
              >
+                <option value={1}>1 Month</option>
                 <option value={3}>3 Months</option>
                 <option value={6}>6 Months</option>
                 <option value={12}>12 Months</option>
@@ -74,11 +75,11 @@ const MonthlySummary = () => {
                  return (
                   <tr key={r.month} className="group hover:bg-blue-50/30 transition-colors">
                     <td className="p-5 font-bold text-gray-800">{r.month}</td>
-                    <td className="p-5 text-emerald-600 font-medium">+${r.income.toFixed(2)}</td>
-                    <td className="p-5 text-red-500 font-medium">-${r.expenses.toFixed(2)}</td>
-                    <td className="p-5 text-gray-600">${r.budget.toFixed(2)}</td>
+                    <td className="p-5 text-emerald-600 font-medium">+₹{r.income.toFixed(2)}</td>
+                    <td className="p-5 text-red-500 font-medium">-₹{r.expenses.toFixed(2)}</td>
+                    <td className="p-5 text-gray-600">₹{r.budget.toFixed(2)}</td>
                     <td className={`p-5 font-bold ${savings >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {savings >= 0 ? '+' : ''}${savings.toFixed(2)}
+                        {savings >= 0 ? '+' : ''}₹{savings.toFixed(2)}
                     </td>
                   </tr>
                 );

@@ -100,21 +100,47 @@ def auto_budget(budget: BudgetCreate, authorization: str | None = Header(default
         raise HTTPException(status_code=400, detail="Failed to set auto budget")
     return resp.data[0]
 
+from datetime import date
+
 @router.get("/history")
 def history(months: int = 6, authorization: str | None = Header(default=None)):
     user_id = get_user_by_token(authorization) if authorization else None
     if not user_id:
         raise HTTPException(status_code=401, detail="Login required")
+    
+    # Collect all unique months from budgets, income, and expenses tables
+    budgets_resp = supabase.table("budgets").select("month").eq("user_id", user_id).execute().data or []
+    income_resp = supabase.table("income").select("date").eq("user_id", user_id).execute().data or []
+    expense_resp = supabase.table("expenses").select("date").eq("user_id", user_id).execute().data or []
+
+    all_months = set()
+    for b in budgets_resp:
+        if b.get("month"):
+            all_months.add(b["month"])
+    for i in income_resp:
+        if i.get("date"):
+            all_months.add(str(i["date"])[:7])
+    for e in expense_resp:
+        if e.get("date"):
+            all_months.add(str(e["date"])[:7])
+
+    if not all_months:
+        current_m = date.today().strftime("%Y-%m")
+        all_months.add(current_m)
+
+    # Sort descending and take requested number of months
+    sorted_months = sorted(list(all_months), reverse=True)[:months]
+    sorted_months.reverse()  # Chronological order
+
     out = []
-    resp = supabase.table("budgets").select("*").eq("user_id", user_id).order("month", desc=False).limit(months).execute().data
-    for b in resp:
-        m = b["month"]
-        incomes, expenses, _ = finance_service.get_monthly_data(user_id, m)
+    for m in sorted_months:
+        incomes, expenses, budget_data = finance_service.get_monthly_data(user_id, m)
+        budget_val = float(budget_data.get("total_budget") or 0) if budget_data else 0.0
         out.append({
             "month": m,
-            "income": sum(i["amount"] for i in incomes),
-            "expenses": sum(e["amount"] for e in expenses),
-            "budget": float(b.get("total_budget") or 0)
+            "income": sum(item["amount"] for item in incomes),
+            "expenses": sum(item["amount"] for item in expenses),
+            "budget": budget_val
         })
     return out
 
@@ -136,7 +162,7 @@ def budget_plan(req: BudgetPlanRequest, authorization: str | None = Header(defau
     savings = monthly_income * 0.2
     total_budget = needs + wants
     supabase.table("budgets").upsert({"user_id": user_id, "month": req.month, "total_budget": total_budget}, on_conflict="user_id, month").execute()
-    ctx = f"Month: {req.month}. Income: {monthly_income:.2f}. Needs: {needs:.2f}. Wants: {wants:.2f}. Savings: {savings:.2f}."
+    ctx = f"Month: {req.month}. Income: ₹{monthly_income:.2f}. Needs: ₹{needs:.2f}. Wants: ₹{wants:.2f}. Savings: ₹{savings:.2f}."
     text = get_ai_response("Explain this 50/30/20 budget plan to the user in simple terms.", context=ctx)
     if not isinstance(text, str):
         text = "Generated a 50/30/20 plan allocating 50% to needs, 30% to wants, and 20% to savings."
